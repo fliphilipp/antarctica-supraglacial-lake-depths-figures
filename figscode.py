@@ -392,7 +392,7 @@ def plot_imagery(fn, days_buffer=5, max_cloud_prob=30, xlm=[None, None], ylm=[No
             ax.plot([ximg[-1]+fac*xrng,ximg[0]-fac*xrng], [yimg[-1]+fac*yrng, yimg[0]-fac*yrng], 'k:', lw=1)
             ax.annotate('', xy=(ximg[-1]+fac*xrng, yimg[-1]+fac*yrng), xytext=(ximg[0]-fac*xrng, yimg[0]-fac*yrng),
                              arrowprops=dict(width=0, lw=0, headwidth=5, headlength=5, color='k'),zorder=1000)
-            ax.plot(ximg, yimg, 'r-', lw=1, zorder=5000)
+            ax.plot(ximg, yimg, 'r-', lw=1, zorder=5000, solid_capstyle='butt')
         else:
             ax.annotate('', xy=(ximg[-1], yimg[-1]), xytext=(ximg[0], yimg[0]),
                              arrowprops=dict(width=0.7*increase_gtwidth, headwidth=5*increase_gtwidth, 
@@ -410,7 +410,7 @@ def plot_imagery(fn, days_buffer=5, max_cloud_prob=30, xlm=[None, None], ylm=[No
             lon_bed[(np.isnan(surf)) | (np.isnan(bed))] = np.nan
             lat_bed[(np.isnan(surf)) | (np.isnan(bed))] = np.nan
             xb, yb = warp.transform(src_crs='epsg:4326', dst_crs=myImage.crs, xs=lon_bed, ys=lat_bed)
-            ax.plot(xb, yb, 'r-', lw=increase_gtwidth, zorder=5000)
+            ax.plot(xb, yb, 'r-', lw=increase_gtwidth, zorder=5000, solid_capstyle='butt')
         
         if not ax:
             fig.tight_layout(pad=0)
@@ -517,12 +517,13 @@ def plotIS2(fn, ax=None, xlm=[None, None], ylm=[None,None], cmap=cmc.lapaz_r, na
     len_surf_km = len_surf_m/1000
     arr_x1 = x_mid - len_surf_m / 2
     arr_x2 = x_mid + len_surf_m / 2
+    arr_xshorten = np.abs(arr_x2 - arr_x1) / 3
 
     arrs_size = 1.0
     head_size = 7.5
-    ax.annotate('', xy=(arr_x1, arr_y), xytext=(arr_x2, arr_y),
+    ax.annotate('', xy=(arr_x1, arr_y), xytext=(arr_x2 - arr_xshorten, arr_y),
                          arrowprops=dict(width=arrs_size, headwidth=head_size, headlength=head_size, color='C0'),zorder=1000)
-    ax.annotate('', xy=(arr_x2, arr_y), xytext=(arr_x1, arr_y),
+    ax.annotate('', xy=(arr_x2, arr_y), xytext=(arr_x1 + arr_xshorten, arr_y),
                          arrowprops=dict(width=arrs_size, headwidth=head_size, headlength=head_size, color='C0'),zorder=1000)
     ax.text(x_mid, txty, r'\textbf{%.1f km}' % len_surf_km, fontsize=plt.rcParams['font.size'], ha='center', va='bottom', color='C0', fontweight='bold',
             bbox=dict(facecolor='white', alpha=1.0, boxstyle='round,pad=0.1,rounding_size=0.3', lw=0))
@@ -549,11 +550,12 @@ def plotIS2(fn, ax=None, xlm=[None, None], ylm=[None,None], cmap=cmc.lapaz_r, na
     arr_len = y_len
     arr_y1 = y_mid + arr_len / 2
     arr_y2 = y_mid - arr_len / 2
+    arr_yshorten = np.abs(arr_y2 - arr_y1) / 3
     ref_index = 1.336
     dep_round = np.round(y_len / ref_index, 1)
-    ax.annotate('', xy=(arr_x, arr_y2), xytext=(arr_x, arr_y1),
+    ax.annotate('', xy=(arr_x, arr_y2), xytext=(arr_x, arr_y1 - arr_yshorten),
                          arrowprops=dict(width=arrs_size, headwidth=head_size, headlength=head_size, color='r'),zorder=1000)
-    ax.annotate('', xy=(arr_x, arr_y1), xytext=(arr_x, arr_y2),
+    ax.annotate('', xy=(arr_x, arr_y1), xytext=(arr_x, arr_y2 + arr_yshorten),
                          arrowprops=dict(width=arrs_size, headwidth=head_size, headlength=head_size, color='r'),zorder=1000)
     ax.text(txt_x, y_mid, r'\textbf{%.1f m}' % dep_round, fontsize=plt.rcParams['font.size'], ha='right', va='center', color='r', fontweight='bold',
             bbox=dict(facecolor='white', alpha=1.0, lw=0, boxstyle='round,pad=0.03,rounding_size=0.3'), rotation=90)
